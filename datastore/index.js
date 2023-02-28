@@ -5,12 +5,23 @@ const counter = require('./counter');
 
 var items = {};
 
-// Public API - Fix these CRUD functions ///////////////////////////////////////
+// Public API - Fix these CRUD functions ////////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  var updateItems = (err, id) => {
+    items[id] = text;
+    let pathname = path.join(exports.dataDir, `${id}.txt`);
+    fs.writeFile( pathname, text, (err) => {
+      if (err) {
+        throw ('error writing todo file');
+      } else {
+        callback(null, { id, text });
+      }
+    });
+  };
+
+  counter.getNextUniqueId(updateItems);
+
 };
 
 exports.readAll = (callback) => {
